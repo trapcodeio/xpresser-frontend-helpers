@@ -1,5 +1,5 @@
 {
-  "name": "@trapcodeio/xpresser-frontend-helpers",
+  "name": "@trapcode/xpresser-frontend-helpers",
   "version": "1.0.0",
   "description": "Xpresser Frontend Helper",
   "main": "js/index.js",
