@@ -7,8 +7,8 @@ Create a javascript file of all **named routes** that can be imported and bundle
 When working with lots of routes, Sometimes you find it difficult to remember the url of your routes And the glorious
 xpresser `$.helpers.route()` helper function that converts names to urls can't be accessed in Frontend.
 
-For Example, we have a route like this
-Backend
+For Example, we have a route like this Backend
+
 ```javascript
 $.router.get('/user/:userId/uploads/:fileId/') // /user/164/song/733
 ```
@@ -29,13 +29,9 @@ that can be configured to use any `Http Library` you are using. This file includ
 For example using the same example above, But we have to add a name to identify the route.
 
 ```javascript
-Backend
 router.get('/user/:userId/uploads/:fileId/', http => {
   return {file: 'image.png'}
 }).name('uploaded_file') // /user/164/song/733
-
-// Simple Routes
-
 ```
 
 In your frontend
@@ -43,11 +39,13 @@ In your frontend
 ```javascript
 import ServerRequests from "./auto-generated-file";
 
-await ServerRequests.get.uploaded_file([userId, songId]); // returns {"file": "image.png"}
+await ServerRequests.get.uploaded_file([userId, fileId]); // returns {"file": "image.png"}
 ```
 
 ### More Examples
+
 Backend
+
 ```javascript
 router.get('/users', 'UserController@users').name('users');
 router.post('/users', 'UserController@create').name('user.create');
@@ -85,7 +83,8 @@ await ServerRequests.get.songs(["hip-hop", 2020, 4, 15]) // GET: /songs/hip-hop/
 - Easily supports any http library.
 
 This came like an idea to me, so I decided to bring it to life.
-Note: this is still experimental. I have lots of work on my table so i won't be paying attention to it for now...
-I will be updating my local version during my day-to-day use then someday i will update this.
+
+Note: this is still experimental, I have lots of work on my table. So I won't be paying attention to it for now... I will
+be updating my local version during my day-to-day use then someday I will update this.
 
 For now, it only generates the file. you have to configure it to work like the Examples above. 🤦‍♂️
