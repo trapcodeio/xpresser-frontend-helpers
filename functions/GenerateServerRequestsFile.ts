@@ -9,6 +9,10 @@ type ProcessedRouteData = RouteData & { url: string };
 export = ($: DollarSign) => {
 
     let JsContent: string[] = [
+        `/*
+        * This is an auto-generated file.
+        * ----- DO NOT MODIFY -----
+        * */`,
         `import handleRequest from './ServerRoutesHandler';`,
         ``,
         `export default {`
