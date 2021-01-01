@@ -1,0 +1,25 @@
+{
+  "dev": {
+    "main": "tests/server.ts",
+    "start_cron": "ts-node-dev --transpile-only",
+    "start_server": "ts-node-dev --respawn --transpile-only",
+    "start_console": "ts-node-dev --transpile-only",
+    "jobs_path": "backend/jobs"
+  },
+  "prod": {
+    "main": "dist/tests/server.js",
+    "start_cron": "pm2 start",
+    "stop_cron": "pm2 stop",
+    "start_server": "pm2 start",
+    "stop_server": "pm2 stop",
+    "start_console": "node",
+    "jobs_path": "dist/backend/jobs"
+  },
+  "async_cron_jobs": false,
+  "stacks": {
+    "tsc" : [
+      "tsc -p tsconfig.json"
+    ]
+  }
+}
+

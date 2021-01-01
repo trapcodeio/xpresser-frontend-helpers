@@ -3,3 +3,4 @@
 node_modules
 js
 types
+tests/src/ServerRequests.js

@@ -1,10 +1,11 @@
 import type {DollarSign} from "xpresser/types";
 import os = require("os");
 import {RouteData} from "@xpresser/router/src/custom-types"
+import {makeDirIfNotExist} from "./Utils";
 // @ts-ignore
 const {js: beautify} = require('js-beautify');
 
-type ProcessedRouteData = RouteData & {url: string};
+type ProcessedRouteData = RouteData & { url: string };
 export = ($: DollarSign) => {
 
     let JsContent: string[] = [
@@ -25,7 +26,12 @@ export = ($: DollarSign) => {
         }
     }
 
-    const ControllersPath = $.path.base('src/ServerRequests.js')
+    const ServerRequestsFilePath = $.path.base('src/ServerRequests.js')
+    try {
+        makeDirIfNotExist(ServerRequestsFilePath, true);
+    } catch (e) {
+        return $.logError(e.message);
+    }
 
 
     for (const method of Controllers.keys()) {
@@ -46,7 +52,7 @@ export = ($: DollarSign) => {
     content = beautify(content, {indent_size: 2, space_in_empty_paren: true});
 
     $.file.fs().writeFileSync(
-        ControllersPath,
+        ServerRequestsFilePath,
         content
     );
     $.logCalmly("FControllers Synced Successfully.");
@@ -80,9 +86,10 @@ export = ($: DollarSign) => {
         const path = route.url;
         const commentLines = `
         /**
-         * ${route.controller}
-         * @example
-         * {name: '${route.name}', path: '${route.path}'}
+         * **${route.controller}**
+         * 
+         * - \`[${route.name}]\`
+         * - \`${route.method?.toUpperCase()}: ${route.path}\`
          */
         `.trim();
 

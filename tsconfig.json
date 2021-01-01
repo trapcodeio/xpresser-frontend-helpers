@@ -90,6 +90,7 @@
   },
   "exclude": [
     "types",
-    "js"
+    "js",
+    "tests"
   ]
 }

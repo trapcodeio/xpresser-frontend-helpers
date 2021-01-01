@@ -1,3 +1,5 @@
 .idea
 .vscode
 node_modules
+tests
+use-xjs-cli.json
