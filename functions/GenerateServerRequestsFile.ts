@@ -1,14 +1,26 @@
 import type {DollarSign} from "xpresser/types";
 import {RouteData} from "@xpresser/router/src/custom-types"
-import {getRouteParams, makeDirIfNotExist, paramsToTsType} from "./Utils";
+import {getRouteParams, paramsToTsType} from "./Utils";
 import os = require("os");
 import pretty = require("prettier");
+import PluginConfig from "../plugin-config";
+
 
 // @ts-ignore
 const {js: beautify} = require('js-beautify');
 
 type ProcessedRouteData = RouteData & { url: string };
 export = ($: DollarSign) => {
+    const pluginConfig: {
+        syncFilesOnServerBooted: boolean,
+        buildFolder: string,
+        strictUrlParser: boolean,
+        skipRouteIf(name: string): boolean,
+        namespace: string
+    } = PluginConfig.all();
+
+    let pluginPath = '@trapcode/xpresser-frontend-helpers';
+
 
     let JsContent: string[] = [
         `/*
@@ -16,7 +28,7 @@ export = ($: DollarSign) => {
         * ----- DO NOT MODIFY -----
         * */`,
         `import s from './ServerRoutesHandler';`,
-        `import {parseUrl as p} from '../../index';`,
+        `import {${pluginConfig.strictUrlParser ? 'parseUrlStrict' : 'parseUrl'} as p} from '${pluginPath}';`,
         ``,
         `export default {`
     ];
@@ -34,7 +46,7 @@ export = ($: DollarSign) => {
         `export type SRConfig = Partial<{query: SRQuery, body: SRBody}> & Record<string, any>;`,
         '',
         'declare const _default: {'
-    ]
+    ];
 
     // ProcessRoutes.
     const routes = $.routerEngine.allProcessedRoutes() as ProcessedRouteData[];
@@ -42,21 +54,19 @@ export = ($: DollarSign) => {
     const Controllers = $.objectCollection();
     for (const route of routes) {
         const {name} = route;
-        if (typeof name === "string") {
+        if (typeof name === "string" && !pluginConfig.skipRouteIf(name)) {
             let fControllerPath = `${route.method}.${name}`
             Controllers.set(fControllerPath, () => ({...route}));
         }
     }
 
-    const ServerRequestsFilePath = $.path.base('src/ServerRequests.js')
-    const TsServerRequestsFilePath = $.path.base('src/ServerRequests.d.ts');
-
-    try {
-        makeDirIfNotExist(ServerRequestsFilePath, true);
-    } catch (e) {
-        return $.logError(e.message);
+    const folder = pluginConfig.buildFolder;
+    if (!$.file.isDirectory(folder)) {
+        return $.logError('FrontendHelper: config {buildFolder} does not exist.')
     }
 
+    const ServerRequestsFilePath = `${folder}/ServerRequests.js`;
+    const TsServerRequestsFilePath = `${folder}/ServerRequests.d.ts`;
 
     for (const method of Controllers.keys()) {
         const methodRoutes = Controllers.get(method);
@@ -81,16 +91,17 @@ export = ($: DollarSign) => {
     let tsContent = TsContent.join(os.EOL);
 
     content = beautify(content, {indent_size: 2, space_in_empty_paren: true});
-    /*tsContent = pretty.format(tsContent, {
+    tsContent = pretty.format(tsContent, {
         semi: true,
         parser: "typescript",
         bracketSpacing: false,
         tabWidth: 2
     });
-    $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);*/
+
+    $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
     $.file.fs().writeFileSync(ServerRequestsFilePath, content);
 
-    $.logCalmly("FControllers Synced Successfully.");
+    $.logCalmly("ServerRequests file synced successfully.");
 
 
     function jsLine(line: string) {

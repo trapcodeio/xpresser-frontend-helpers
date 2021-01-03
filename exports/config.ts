@@ -1,20 +1,26 @@
 import type {DollarSign} from "xpresser/types";
 
-export = ($: DollarSign) => ({
+export = ($: DollarSign) => {
+    const isDev = $.env("NODE_ENV") === "development";
 
-    syncFilesOnServerBooted: true,
+    return {
+        syncFilesOnServerBooted: true,
 
-    paths: {
-        serverRequestsFile: $.path.base('src/ServerRequests.js'),
-        serverRequestsHandlerFile: $.path.base('src/ServerRequestsHandler.js'),
-    },
+        // Folder where generated files will be saved to
+        buildFolder: $.path.base('src'),
 
-    /**
-     * Skip Route if this function returns true.
-     * @param name
-     */
-    skipRouteIf(name: string) {
-        // Note this will run on every route name.
-        return name === "name_of_route_you_wish_to_skip";
+        /**
+         * When enabled, the generated frontend file will validate route parameters.
+         */
+        strictUrlParser: isDev,
+
+        /**
+         * Skip Route if this function returns true.
+         * @param name
+         */
+        skipRouteIf(name: string) {
+            // Note this will run on every route name.
+            return name === "name_of_route_you_wish_to_skip";
+        }
     }
-})
+}
