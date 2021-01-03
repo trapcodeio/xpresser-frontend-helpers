@@ -94,8 +94,8 @@ export = ($: DollarSign) => {
     tsContent = pretty.format(tsContent, {
         semi: true,
         parser: "typescript",
-        bracketSpacing: false,
-        tabWidth: 2
+        bracketSpacing: true,
+        tabWidth: 4
     });
 
     $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
@@ -171,7 +171,7 @@ export = ($: DollarSign) => {
 
             // check for route params
             if (routeParamsKeys.length) {
-                argumentsType = `params: SRParams | {${paramsToTsType(routeParams)}}`
+                argumentsType = `params: {${paramsToTsType(routeParams)}} | SRParams`
             }
 
             if (['post', 'put', 'patch'].includes(route.method.toLowerCase())) {
@@ -190,7 +190,7 @@ export = ($: DollarSign) => {
 
             argumentsType += `, config?: SRConfig, ...others: any[]`;
 
-            let defaultTsType = `${shortName}(${argumentsType}): void;`
+            let defaultTsType = `${shortName}<T=any>(${argumentsType}): T;`
 
             tsLines([
                 '',
