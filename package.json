@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@xpresser/plugin-tools": "^1.1.0",
-    "js-beautify": "^1.13.0"
+    "js-beautify": "^1.13.0",
+    "path-to-regexp": "^6.2.0"
   }
 }

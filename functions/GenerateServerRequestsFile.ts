@@ -1,7 +1,8 @@
 import type {DollarSign} from "xpresser/types";
-import os = require("os");
 import {RouteData} from "@xpresser/router/src/custom-types"
-import {makeDirIfNotExist} from "./Utils";
+import {getRouteParams, makeDirIfNotExist, paramsToTsType} from "./Utils";
+import os = require("os");
+
 // @ts-ignore
 const {js: beautify} = require('js-beautify');
 
@@ -18,6 +19,15 @@ export = ($: DollarSign) => {
         `export default {`
     ];
 
+    let TsContent: string[] = [
+        `/*
+        * This is an auto-generated file.
+        * ----- DO NOT MODIFY -----
+        * */`,
+        '',
+        'declare const _default: {'
+    ]
+
     // ProcessRoutes.
     const routes = $.routerEngine.allProcessedRoutes() as ProcessedRouteData[];
 
@@ -31,6 +41,8 @@ export = ($: DollarSign) => {
     }
 
     const ServerRequestsFilePath = $.path.base('src/ServerRequests.js')
+    const TsServerRequestsFilePath = $.path.base('src/ServerRequests.d.ts');
+
     try {
         makeDirIfNotExist(ServerRequestsFilePath, true);
     } catch (e) {
@@ -43,22 +55,28 @@ export = ($: DollarSign) => {
 
         /* Start Method Object Template */
         jsLine(`${method}: {`) // method: {
+        tsLine(`${method}: {`)
 
         // console.log(methodRoutes)
         loopAllKeysOfMethod(methodRoutes);
 
         /* End Method Object Template */
         jsLine(`},`) // };
+        tsLine(`},`) // };
     }
 
-    JsContent.push('};')
-    let content = JsContent.join(os.EOL);
-    content = beautify(content, {indent_size: 2, space_in_empty_paren: true});
+    JsContent.push('};');
+    TsContent.push('};')
+    TsContent.push('export default _default;')
 
-    $.file.fs().writeFileSync(
-        ServerRequestsFilePath,
-        content
-    );
+    let content = JsContent.join(os.EOL);
+    let tsContent = TsContent.join(os.EOL);
+
+    content = beautify(content, {indent_size: 2, space_in_empty_paren: true});
+    tsContent = beautify(tsContent, {indent_size: 2, space_in_empty_paren: true});
+
+    // $.file.fs().writeFileSync(ServerRequestsFilePath, content);
+    $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
     $.logCalmly("FControllers Synced Successfully.");
 
 
@@ -66,8 +84,16 @@ export = ($: DollarSign) => {
         JsContent.push(line);
     }
 
+    function tsLine(line: string) {
+        TsContent.push(line);
+    }
+
     function jsLines(lines: string[]) {
         JsContent = JsContent.concat(lines);
+    }
+
+    function tsLines(lines: string[]) {
+        TsContent = TsContent.concat(lines);
     }
 
 
@@ -80,29 +106,72 @@ export = ($: DollarSign) => {
             } else {
 
                 jsLine(`${name}: {`);
+                tsLine(`${name}: {`);
+
                 loopAllKeysOfMethod(route)
+
                 jsLine(`},`)
+                tsLine(`},`)
             }
         }
     }
 
     function jsRouterNameFunction(shortName: string, route: ProcessedRouteData) {
-        const path = route.url;
-        const commentLines = `
-        /**
-         * **${route.controller}**
-         * 
-         * - \`[${route.name}]\`
-         * - \`${route.method?.toUpperCase()}: ${route.path}\`
-         */
-        `.trim();
+        if (route && route.method) {
+            const path = route.url;
+            const routeParams = getRouteParams(route.path as string)
+            const routeParamsKeys = Object.keys(routeParams);
+            const commentLines = `
+            /**
+             * **${route.controller}**
+             * 
+             * - \`[${route.name}]\`
+             * - \`${route.method.toUpperCase()}: ${route.path}\`
+             */
+            `.trim();
 
-        jsLines([
-            commentLines,
-            `${shortName}: (...args) => handleRequest({`,
-            `method: '${route.method}',`,
-            `path: '${path}',`,
-            `}, args),`,
-        ])
+            jsLines([
+                '',
+                commentLines,
+                `${shortName}: (...args) => handleRequest({`,
+                `method: '${route.method}',`,
+                `path: '${path}',`,
+                `}, args),`,
+            ]);
+
+            let argumentsType!: string;
+
+            // check for route params
+            if (routeParamsKeys.length) {
+                argumentsType = `params: string | number | (string | number)[] | {${paramsToTsType(routeParams)}}`
+            }
+
+            if (['post', 'put', 'patch'].includes(route.method.toLowerCase())) {
+                if (argumentsType) {
+                    argumentsType += `, body: Record<number|string, any>`
+                } else {
+                    argumentsType = `body: Record<number|string, any>`
+                }
+            } else if (route.method.toLowerCase() === "get") {
+                if (argumentsType) {
+                    argumentsType += `, query: Record<number|string, any>`
+                } else {
+                    argumentsType = `query: Record<number|string, any>`
+                }
+            }
+
+            if (!argumentsType) {
+                argumentsType = `...args: any[]`;
+            }
+
+            let defaultTsType = `${shortName}(${argumentsType}): void;`
+
+            tsLines([
+                '',
+                commentLines,
+                defaultTsType
+            ])
+        }
+
     }
 }

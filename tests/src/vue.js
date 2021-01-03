@@ -1,5 +1,5 @@
 import ServerRequest from "./ServerRequests";
 
 function main(){
-  ServerRequest.post.user.create()
+  ServerRequest.get.songs({})
 }

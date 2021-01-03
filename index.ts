@@ -4,9 +4,9 @@ import pluginConfig from "./plugin-config";
 export function run(config: any, $: DollarSign) {
 
     if (pluginConfig.get('syncFilesOnServerBooted')) {
-        $.on.serverBooted(next => {
+        $.on.bootServer(next => {
             // Continue with boot
-            next();
+            // next();
 
             // Import ServerRequestFile generator
             const GenerateServerRequestsFile = require("./functions/GenerateServerRequestsFile");
