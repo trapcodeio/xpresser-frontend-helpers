@@ -15,7 +15,7 @@ export function makeDirIfNotExist($path: string, $isFile = false) {
     }
 
     if (!fs.existsSync($path)) {
-        // fs.mkdirSync($path, {recursive: true});
+        fs.mkdirSync($path, {recursive: true});
     }
 
     return $path;
@@ -47,8 +47,8 @@ export function paramsToTsType(params: Record<string | number, boolean>) {
 
     for (const param of Object.keys(params)) {
         params[param] ?
-            type.push(`${param}: string | number`):
-            type.push(`${param}?: string | number`)
+            type.push(`${param}: StringOrNumber`):
+            type.push(`${param}?: StringOrNumber`)
     }
 
     return type.join(',')

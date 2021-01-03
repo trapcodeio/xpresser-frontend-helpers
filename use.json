@@ -1,6 +1,6 @@
 {
   "namespace": "frontend-helpers",
-  "use_index": "js/index.js",
+  "use_index": "js/plugin-index.js",
   "importable": {
     "configs": "js/exports/config.js",
     "configs.ts": "exports/config.ts"

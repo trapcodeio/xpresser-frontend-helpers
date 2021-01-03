@@ -2,6 +2,7 @@ import type {DollarSign} from "xpresser/types";
 import {RouteData} from "@xpresser/router/src/custom-types"
 import {getRouteParams, makeDirIfNotExist, paramsToTsType} from "./Utils";
 import os = require("os");
+import pretty = require("prettier");
 
 // @ts-ignore
 const {js: beautify} = require('js-beautify');
@@ -14,7 +15,8 @@ export = ($: DollarSign) => {
         * This is an auto-generated file.
         * ----- DO NOT MODIFY -----
         * */`,
-        `import handleRequest from './ServerRoutesHandler';`,
+        `import s from './ServerRoutesHandler';`,
+        `import {parseUrl as p} from '../../index';`,
         ``,
         `export default {`
     ];
@@ -24,6 +26,12 @@ export = ($: DollarSign) => {
         * This is an auto-generated file.
         * ----- DO NOT MODIFY -----
         * */`,
+        '',
+        `export type StringOrNumber = string | number;`,
+        `export type SRBody = Record<StringOrNumber, any>;`,
+        `export type SRQuery = Record<StringOrNumber, StringOrNumber>;`,
+        `export type SRParams = StringOrNumber | StringOrNumber[];`,
+        `export type SRConfig = Partial<{query: SRQuery, body: SRBody}> & Record<string, any>;`,
         '',
         'declare const _default: {'
     ]
@@ -73,10 +81,15 @@ export = ($: DollarSign) => {
     let tsContent = TsContent.join(os.EOL);
 
     content = beautify(content, {indent_size: 2, space_in_empty_paren: true});
-    tsContent = beautify(tsContent, {indent_size: 2, space_in_empty_paren: true});
+    /*tsContent = pretty.format(tsContent, {
+        semi: true,
+        parser: "typescript",
+        bracketSpacing: false,
+        tabWidth: 2
+    });
+    $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);*/
+    $.file.fs().writeFileSync(ServerRequestsFilePath, content);
 
-    // $.file.fs().writeFileSync(ServerRequestsFilePath, content);
-    $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
     $.logCalmly("FControllers Synced Successfully.");
 
 
@@ -102,7 +115,7 @@ export = ($: DollarSign) => {
             const route = routes[name];
             if (typeof route === "function") {
                 const thisRoute = route() as ProcessedRouteData;
-                jsRouterNameFunction(name, thisRoute);
+                setRouterNameFunction(name, thisRoute);
             } else {
 
                 jsLine(`${name}: {`);
@@ -116,9 +129,8 @@ export = ($: DollarSign) => {
         }
     }
 
-    function jsRouterNameFunction(shortName: string, route: ProcessedRouteData) {
+    function setRouterNameFunction(shortName: string, route: ProcessedRouteData) {
         if (route && route.method) {
-            const path = route.url;
             const routeParams = getRouteParams(route.path as string)
             const routeParamsKeys = Object.keys(routeParams);
             const commentLines = `
@@ -131,38 +143,41 @@ export = ($: DollarSign) => {
             `.trim();
 
             jsLines([
-                '',
-                commentLines,
-                `${shortName}: (...args) => handleRequest({`,
-                `method: '${route.method}',`,
-                `path: '${path}',`,
-                `}, args),`,
+                // '',
+                // commentLines,
+                `${shortName}: (...args) => s(...p([`,
+                `'${route.method}', '${route.path}',`,
+                `${JSON.stringify(routeParams).split('"').join("")},`,
+                `], args)),`,
             ]);
+
+
+            /**
+             * Typescript Lines.
+             */
 
             let argumentsType!: string;
 
             // check for route params
             if (routeParamsKeys.length) {
-                argumentsType = `params: string | number | (string | number)[] | {${paramsToTsType(routeParams)}}`
+                argumentsType = `params: SRParams | {${paramsToTsType(routeParams)}}`
             }
 
             if (['post', 'put', 'patch'].includes(route.method.toLowerCase())) {
                 if (argumentsType) {
-                    argumentsType += `, body: Record<number|string, any>`
+                    argumentsType += `, body?: SRBody`
                 } else {
-                    argumentsType = `body: Record<number|string, any>`
+                    argumentsType = `body?: SRBody`
                 }
-            } else if (route.method.toLowerCase() === "get") {
+            } else {
                 if (argumentsType) {
-                    argumentsType += `, query: Record<number|string, any>`
+                    argumentsType += `, query?: SRQuery`
                 } else {
-                    argumentsType = `query: Record<number|string, any>`
+                    argumentsType = `query?: SRQuery`
                 }
             }
 
-            if (!argumentsType) {
-                argumentsType = `...args: any[]`;
-            }
+            argumentsType += `, config?: SRConfig, ...others: any[]`;
 
             let defaultTsType = `${shortName}(${argumentsType}): void;`
 

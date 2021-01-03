@@ -1,1 +1,3 @@
-export default function handleRequest () {}
+export default function handleRequest (data, args) {
+  console.log(data, args);
+}
