@@ -55,6 +55,7 @@ export function parseUrl(data: [string, string, Record<string | number, boolean>
     return [
         url,
         {
+            method,
             query,
             body,
             ...(args[1] || {}),
