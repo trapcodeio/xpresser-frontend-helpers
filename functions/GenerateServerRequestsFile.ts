@@ -68,13 +68,17 @@ export = ($: DollarSign) => {
 
     const Controllers = $.objectCollection();
     jsLine(`const api = {`)
+    const addedNames: Record<string, any> = {};
     for (const route of routes) {
         const {name} = route;
         if (typeof name === "string" && !pluginConfig.skipRouteIf(name)) {
             const routeParams = getRouteParams(route.path as string);
             let fControllerPath = `${route.method}.${name}`
             Controllers.set(fControllerPath, () => ({...route}));
-            jsLine(`'${name}': ['${route.method}', '${route.path}', ${JSON.stringify(routeParams).split('"').join("")}],`)
+
+            if(!addedNames[name]){
+                jsLine(`'${name}': ['${route.method}', '${route.path}', ${JSON.stringify(routeParams).split('"').join("")}],`)
+            }
         }
     }
     jsLines([`};`, ''])
