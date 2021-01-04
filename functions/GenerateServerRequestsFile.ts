@@ -67,7 +67,7 @@ export = ($: DollarSign) => {
     const routes = $.routerEngine.allProcessedRoutes() as ProcessedRouteData[];
 
     const Controllers = $.objectCollection();
-    jsLine(`const api = {`)
+    jsLine(`const a = [`)
     const addedNames: Record<string, any> = {};
     for (const route of routes) {
         const {name} = route;
@@ -76,20 +76,33 @@ export = ($: DollarSign) => {
             let fControllerPath = `${route.method}.${name}`
             Controllers.set(fControllerPath, () => ({...route}));
 
-            if(!addedNames[name]){
-                jsLine(`'${name}': ['${route.method}', '${route.path}', ${JSON.stringify(routeParams).split('"').join("")}],`)
-            }
+            // if(!addedNames[name]){
+            jsLine(`['${route.method}', '${route.name}', '${route.path}', ${JSON.stringify(routeParams).split('"').join("")}],`)
+            // addedNames[name] = true
+            // }
         }
     }
-    jsLines([`};`, ''])
+    jsLines([`];`, ''])
+
+    jsLines([
+        '// Autogenerate useful objects',
+        'const b = {}, c = {};\n' +
+        'for (const d of a) {\n' +
+        '  // name => [url, params]\n' +
+        '  c[d[1]] = [d[2], d[3]];\n' +
+        '  // method.name => [url, params]\n' +
+        '  c[`${d[0]}.${d[1]}`] = [d[2], d[3]];\n' +
+        '  // method.name => [method, url, params]\n' +
+        '  b[`${d[0]}.${d[1]}`] = [d[0], d[2], d[3]];\n' +
+        '}', ''])
 
 
     jsLine(`export function route(name, params = null, query={}) {`);
-    jsLine(`return r(api, name, params, query);`)
+    jsLine(`return r(c, name, params, query);`)
     jsLines([`}`, '']);
 
     jsLine(`export function routeStrict(name, params = null, query={}) {`);
-    jsLine(`return r(api, name, params, query, true);`)
+    jsLine(`return r(c, name, params, query, true);`)
     jsLines([`}`, '']);
 
 
@@ -183,7 +196,7 @@ export = ($: DollarSign) => {
             `.trim();
 
             jsLines([
-                `${shortName}: (...args) => s(...p(api['${route.name}'], args)),`,
+                `${shortName}: (...args) => s(...p(b['${route.method}.${route.name}'], args)),`,
             ]);
 
 
