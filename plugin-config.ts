@@ -4,7 +4,7 @@ import defaultConfig from './exports/config'
 
 export = ConfigHelpers.loadPluginConfig({
     namespace,
-    configFile: "frontend-helper",
+    configFile: "frontend-helpers",
     type: "function",
     default: defaultConfig,
 }).pluginConfig;

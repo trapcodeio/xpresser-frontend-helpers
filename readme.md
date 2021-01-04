@@ -84,7 +84,9 @@ await ServerRequests.get.songs(["hip-hop", 2020, 4, 15]) // GET: /songs/hip-hop/
 
 This came like an idea to me, so I decided to bring it to life.
 
-Note: this is still experimental, I have lots of work on my table. So I won't be paying attention to it for now... I will
-be updating my local version during my day-to-day use then someday I will update this.
+Note: this is still experimental, I have lots of work on my table. So I won't be paying attention to it for now... I
+will be updating my local version during my day-to-day use then someday I will update this.
 
 For now, it only generates the file. you have to configure it to work like the Examples above. 🤦‍♂️
+
+You can run the test file included.
