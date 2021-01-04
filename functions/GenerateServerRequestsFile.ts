@@ -19,6 +19,12 @@ export = ($: DollarSign) => {
         namespace: string
     } = PluginConfig.all();
 
+    const folder = pluginConfig.buildFolder;
+    if (!$.file.isDirectory(folder)) {
+        return $.logError('FrontendHelper: config {buildFolder} does not exist.')
+    }
+
+    // let pluginPath = '../../index';
     let pluginPath = '@trapcode/xpresser-frontend-helpers';
 
 
@@ -28,9 +34,8 @@ export = ($: DollarSign) => {
         * ----- DO NOT MODIFY -----
         * */`,
         `import s from './ServerRoutesHandler';`,
-        `import {${pluginConfig.strictUrlParser ? 'parseUrlStrict' : 'parseUrl'} as p} from '${pluginPath}';`,
+        `import {internalRouteParser as r, ${pluginConfig.strictUrlParser ? 'parseUrlStrict' : 'parseUrl'} as p} from '${pluginPath}';`,
         ``,
-        `export default {`
     ];
 
     let TsContent: string[] = [
@@ -45,6 +50,16 @@ export = ($: DollarSign) => {
         `export type SRParams = StringOrNumber | StringOrNumber[];`,
         `export type SRConfig = Partial<{query: SRQuery, body: SRBody}> & Record<string, any>;`,
         '',
+        `/**
+         * Parse name to path.
+         */`,
+        `export declare function route(name: string, params?: SRParams, query?: SRQuery): string;`,
+        '',
+        `/**
+         * Parse name to path with validation.
+         */`,
+        `export declare function routeStrict(name: string, params?: SRParams, query?: SRQuery): string;`,
+        '',
         'declare const _default: {'
     ];
 
@@ -52,22 +67,32 @@ export = ($: DollarSign) => {
     const routes = $.routerEngine.allProcessedRoutes() as ProcessedRouteData[];
 
     const Controllers = $.objectCollection();
+    jsLine(`const api = {`)
     for (const route of routes) {
         const {name} = route;
         if (typeof name === "string" && !pluginConfig.skipRouteIf(name)) {
+            const routeParams = getRouteParams(route.path as string);
             let fControllerPath = `${route.method}.${name}`
             Controllers.set(fControllerPath, () => ({...route}));
+            jsLine(`'${name}': ['${route.method}', '${route.path}', ${JSON.stringify(routeParams).split('"').join("")}],`)
         }
     }
+    jsLines([`};`, ''])
 
-    const folder = pluginConfig.buildFolder;
-    if (!$.file.isDirectory(folder)) {
-        return $.logError('FrontendHelper: config {buildFolder} does not exist.')
-    }
+
+    jsLine(`export function route(name, params = null, query={}) {`);
+    jsLine(`return r(api, name, params, query);`)
+    jsLines([`}`, '']);
+
+    jsLine(`export function routeStrict(name, params = null, query={}) {`);
+    jsLine(`return r(api, name, params, query, true);`)
+    jsLines([`}`, '']);
+
 
     const ServerRequestsFilePath = `${folder}/ServerRequests.js`;
     const TsServerRequestsFilePath = `${folder}/ServerRequests.d.ts`;
 
+    jsLine(`export default {`)
     for (const method of Controllers.keys()) {
         const methodRoutes = Controllers.get(method);
 
@@ -154,12 +179,7 @@ export = ($: DollarSign) => {
             `.trim();
 
             jsLines([
-                // '',
-                // commentLines,
-                `${shortName}: (...args) => s(...p([`,
-                `'${route.method}', '${route.path}',`,
-                `${JSON.stringify(routeParams).split('"').join("")},`,
-                `], args)),`,
+                `${shortName}: (...args) => s(...p(api['${route.name}'], args)),`,
             ]);
 
 
@@ -198,6 +218,7 @@ export = ($: DollarSign) => {
                 defaultTsType
             ])
         }
+
 
     }
 }

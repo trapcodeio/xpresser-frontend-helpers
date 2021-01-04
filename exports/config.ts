@@ -15,6 +15,11 @@ export = ($: DollarSign) => {
         strictUrlParser: isDev,
 
         /**
+         * When enabled an encrypted json file of
+         */
+        useRouteHelper: true,
+
+        /**
          * Skip Route if this function returns true.
          * @param name
          */
