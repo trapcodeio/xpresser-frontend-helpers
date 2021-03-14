@@ -94,10 +94,10 @@
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
 
-"@xpresser/plugin-tools@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@xpresser/plugin-tools/-/plugin-tools-1.2.0.tgz#019453123aa4ae5110464b45c30279bbfd6fc4eb"
-  integrity sha512-spA6AlmVFhzuc3Moa49SWRLLL33ahySnOrYAZvW+Rofo6xREmY8gycTHR9I1t5IbW4B/sdrbDM3GJIO1RTjNcA==
+"@xpresser/plugin-tools@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@xpresser/plugin-tools/-/plugin-tools-1.2.1.tgz#bff724af2ba3b6f1f667e80c286d94aebeaf7102"
+  integrity sha512-q9tf1uRrpYBROioi1by8RRTztpwm6YgcIcmByDU90V9kWF3Fp1GJdcaLy+pm48jztyTdmxkyGpL/pw+GgEcdnw==
 
 "@xpresser/router@^1.1.1":
   version "1.1.1"

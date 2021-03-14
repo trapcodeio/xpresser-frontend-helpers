@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@types/prettier": "^2.2.2",
-    "@xpresser/plugin-tools": "^1.2.0",
+    "@xpresser/plugin-tools": "^1.2.1",
     "build-url": "^6.0.1",
     "js-beautify": "^1.13.5",
     "path-to-regexp": "^6.2.0",
