@@ -2,7 +2,7 @@ import {namespace} from "../use.json";
 import xpresser = require("xpresser");
 
 const $ = xpresser.init({
-    env: process.env["NODE_ENV"],
+    env: "development",
     name: `Testing Plugin: ${namespace}`,
     paths: {
         base: __dirname
