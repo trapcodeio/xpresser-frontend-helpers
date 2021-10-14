@@ -2,7 +2,7 @@ import {getInstanceRouter} from "xpresser";
 
 const router = getInstanceRouter();
 
-router.get('/users', 'UserController@users').name('users');
+router.get('/users/:index', 'UserController@users').name('xam');
 router.post('/users', 'UserController@create').name('user.create');
 
 router.get('/user/:userId', 'UserController@user').name('user');

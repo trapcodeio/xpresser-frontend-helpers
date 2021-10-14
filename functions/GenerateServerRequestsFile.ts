@@ -227,7 +227,7 @@ export = ($: DollarSign) => {
 
             argumentsType += `, config?: SRConfig, ...others: any[]`;
 
-            let defaultTsType = `${shortName}<T=any>(${argumentsType}): T;`
+            let defaultTsType = `${shortName}<T=any>(${argumentsType}): Promise<T>;`
 
             tsLines([
                 '',
