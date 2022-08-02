@@ -33,7 +33,7 @@ export = ($: DollarSign) => {
         * This is an auto-generated file.
         * ----- DO NOT MODIFY -----
         * */`,
-        `import s from './ServerRoutesHandler';`,
+        `import s from './ServerRequestsHandler';`,
         `import {internalRouteParser as r, ${pluginConfig.strictUrlParser ? 'parseUrlStrict' : 'parseUrl'} as p} from '${pluginPath}';`,
         ``,
     ];
@@ -68,7 +68,7 @@ export = ($: DollarSign) => {
 
     const Controllers = $.objectCollection();
     jsLine(`const a = [`)
-    const addedNames: Record<string, any> = {};
+
     for (const route of routes) {
         const {name} = route;
         if (typeof name === "string" && !pluginConfig.skipRouteIf(name)) {
@@ -137,13 +137,15 @@ export = ($: DollarSign) => {
         semi: true,
         parser: "typescript",
         bracketSpacing: true,
-        tabWidth: 4
+        tabWidth: 2
     });
 
     $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
     $.file.fs().writeFileSync(ServerRequestsFilePath, content);
 
-    $.logCalmly("ServerRequests file synced successfully.");
+    $.logSuccess("ServerRequests file synced successfully.");
+    $.logCalmly(`ServerRequests Javascript file: ${ServerRequestsFilePath}`);
+    $.logCalmly(`ServerRequests Typescript file: ${TsServerRequestsFilePath}`);
 
 
     function jsLine(line: string) {
@@ -227,7 +229,7 @@ export = ($: DollarSign) => {
 
             argumentsType += `, config?: SRConfig, ...others: any[]`;
 
-            let defaultTsType = `${shortName}<T=any>(${argumentsType}): Promise<T>;`
+            const defaultTsType = `${shortName}<T=any>(${argumentsType}): Promise<T>;`
 
             tsLines([
                 '',
