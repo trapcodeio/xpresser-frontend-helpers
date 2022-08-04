@@ -1,32 +1,22 @@
-import type {DollarSign} from "xpresser/types";
-import {RouteData} from "@xpresser/router/src/custom-types"
-import {getRouteParams, paramsToTsType} from "./Utils";
-import os = require("os");
-import pretty = require("prettier");
-import PluginConfig from "../plugin-config";
-
-
-// @ts-ignore
-const {js: beautify} = require('js-beautify');
+import os from "os";
+import pretty from "prettier";
+import { js as beautify } from "js-beautify";
+import type { DollarSign } from "xpresser/types";
+import { RouteData } from "@xpresser/router/src/custom-types";
+import { getRouteParams, paramsToTsType } from "./Utils";
+import PluginConfig, { FrontendHelperConfig } from "../plugin-config";
 
 type ProcessedRouteData = RouteData & { url: string };
 export = ($: DollarSign) => {
-    const pluginConfig: {
-        syncFilesOnServerBooted: boolean,
-        buildFolder: string,
-        strictUrlParser: boolean,
-        skipRouteIf(name: string): boolean,
-        namespace: string
-    } = PluginConfig.all();
+    const pluginConfig: FrontendHelperConfig & { namespace: string } = PluginConfig.all();
 
     const folder = pluginConfig.buildFolder;
     if (!$.file.isDirectory(folder)) {
-        return $.logError('FrontendHelper: config {buildFolder} does not exist.')
+        return $.logError("FrontendHelper: config {buildFolder} does not exist.");
     }
 
     // let pluginPath = '../../index';
-    let pluginPath = '@trapcode/xpresser-frontend-helpers';
-
+    let pluginPath = "@trapcode/xpresser-frontend-helpers";
 
     let JsContent: string[] = [
         `/*
@@ -34,8 +24,10 @@ export = ($: DollarSign) => {
         * ----- DO NOT MODIFY -----
         * */`,
         `import s from './ServerRequestsHandler';`,
-        `import {internalRouteParser as r, ${pluginConfig.strictUrlParser ? 'parseUrlStrict' : 'parseUrl'} as p} from '${pluginPath}';`,
-        ``,
+        `import {internalRouteParser as r, ${
+            pluginConfig.strictUrlParser ? "parseUrlStrict" : "parseUrl"
+        } as p} from '${pluginPath}';`,
+        ``
     ];
 
     let TsContent: string[] = [
@@ -43,96 +35,97 @@ export = ($: DollarSign) => {
         * This is an auto-generated file.
         * ----- DO NOT MODIFY -----
         * */`,
-        '',
+        "",
         `export type StringOrNumber = string | number;`,
         `export type SRBody = Record<StringOrNumber, any>;`,
         `export type SRQuery = Record<StringOrNumber, StringOrNumber>;`,
         `export type SRParams = StringOrNumber | StringOrNumber[];`,
         `export type SRConfig = Partial<{query: SRQuery, body: SRBody}> & Record<string, any>;`,
-        '',
+        "",
         `/**
          * Parse name to path.
          */`,
         `export declare function route(name: string, params?: SRParams, query?: SRQuery): string;`,
-        '',
+        "",
         `/**
          * Parse name to path with validation.
          */`,
         `export declare function routeStrict(name: string, params?: SRParams, query?: SRQuery): string;`,
-        '',
-        'declare const _default: {'
+        "",
+        "declare const _default: {"
     ];
 
     // ProcessRoutes.
     const routes = $.routerEngine.allProcessedRoutes() as ProcessedRouteData[];
 
     const Controllers = $.objectCollection();
-    jsLine(`const a = [`)
+    jsLine(`const a = [`);
 
     for (const route of routes) {
-        const {name} = route;
+        const { name } = route;
         if (typeof name === "string" && !pluginConfig.skipRouteIf(name)) {
             const routeParams = getRouteParams(route.path as string);
-            let fControllerPath = `${route.method}.${name}`
-            Controllers.set(fControllerPath, () => ({...route}));
+            let fControllerPath = `${route.method}.${name}`;
+            Controllers.set(fControllerPath, () => ({ ...route }));
 
-            // if(!addedNames[name]){
-            jsLine(`['${route.method}', '${route.name}', '${route.path}', ${JSON.stringify(routeParams).split('"').join("")}],`)
-            // addedNames[name] = true
-            // }
+            jsLine(
+                `['${route.method}', '${route.name}', '${route.path}', ${JSON.stringify(routeParams)
+                    .split('"')
+                    .join("")}],`
+            );
         }
     }
-    jsLines([`];`, ''])
+    jsLines([`];`, ""]);
 
     jsLines([
-        '// Autogenerate useful objects',
-        'const b = {}, c = {};\n' +
-        'for (const d of a) {\n' +
-        '  // name => [url, params]\n' +
-        '  c[d[1]] = [d[2], d[3]];\n' +
-        '  // method.name => [url, params]\n' +
-        '  c[`${d[0]}.${d[1]}`] = [d[2], d[3]];\n' +
-        '  // method.name => [method, url, params]\n' +
-        '  b[`${d[0]}.${d[1]}`] = [d[0], d[2], d[3]];\n' +
-        '}', ''])
-
+        "// Autogenerate useful objects",
+        "const b = {}, c = {};\n" +
+            "for (const d of a) {\n" +
+            "  // name => [url, params]\n" +
+            "  c[d[1]] = [d[2], d[3]];\n" +
+            "  // method.name => [url, params]\n" +
+            "  c[`${d[0]}.${d[1]}`] = [d[2], d[3]];\n" +
+            "  // method.name => [method, url, params]\n" +
+            "  b[`${d[0]}.${d[1]}`] = [d[0], d[2], d[3]];\n" +
+            "}",
+        ""
+    ]);
 
     jsLine(`export function route(name, params = null, query={}) {`);
-    jsLine(`return r(c, name, params, query);`)
-    jsLines([`}`, '']);
+    jsLine(`return r(c, name, params, query);`);
+    jsLines([`}`, ""]);
 
     jsLine(`export function routeStrict(name, params = null, query={}) {`);
-    jsLine(`return r(c, name, params, query, true);`)
-    jsLines([`}`, '']);
-
+    jsLine(`return r(c, name, params, query, true);`);
+    jsLines([`}`, ""]);
 
     const ServerRequestsFilePath = `${folder}/ServerRequests.js`;
     const TsServerRequestsFilePath = `${folder}/ServerRequests.d.ts`;
 
-    jsLine(`export default {`)
+    jsLine(`export default {`);
     for (const method of Controllers.keys()) {
         const methodRoutes = Controllers.get(method);
 
         /* Start Method Object Template */
-        jsLine(`${method}: {`) // method: {
-        tsLine(`${method}: {`)
+        jsLine(`${method}: {`); // method: {
+        tsLine(`${method}: {`);
 
         // console.log(methodRoutes)
         loopAllKeysOfMethod(methodRoutes);
 
         /* End Method Object Template */
-        jsLine(`},`) // };
-        tsLine(`},`) // };
+        jsLine(`},`); // };
+        tsLine(`},`); // };
     }
 
-    JsContent.push('};');
-    TsContent.push('};')
-    TsContent.push('export default _default;')
+    JsContent.push("};");
+    TsContent.push("};");
+    TsContent.push("export default _default;");
 
     let content = JsContent.join(os.EOL);
     let tsContent = TsContent.join(os.EOL);
 
-    content = beautify(content, {indent_size: 2, space_in_empty_paren: true});
+    content = beautify(content, { indent_size: 2, space_in_empty_paren: true });
     tsContent = pretty.format(tsContent, {
         semi: true,
         parser: "typescript",
@@ -143,10 +136,9 @@ export = ($: DollarSign) => {
     $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
     $.file.fs().writeFileSync(ServerRequestsFilePath, content);
 
-    $.logSuccess("ServerRequests file synced successfully.");
-    $.logCalmly(`ServerRequests Javascript file: ${ServerRequestsFilePath}`);
-    $.logCalmly(`ServerRequests Typescript file: ${TsServerRequestsFilePath}`);
-
+    $.logSuccess("[FrontendHelper] ServerRequests file synced successfully.");
+    $.logCalmly(`[FrontendHelper] Javascript file: ${ServerRequestsFilePath}`);
+    $.logCalmly(`[FrontendHelper] Typescript file: ${TsServerRequestsFilePath}`);
 
     function jsLine(line: string) {
         JsContent.push(line);
@@ -164,7 +156,6 @@ export = ($: DollarSign) => {
         TsContent = TsContent.concat(lines);
     }
 
-
     function loopAllKeysOfMethod(routes: Record<string, any> = {}) {
         for (const name of Object.keys(routes)) {
             const route = routes[name];
@@ -172,21 +163,20 @@ export = ($: DollarSign) => {
                 const thisRoute = route() as ProcessedRouteData;
                 setRouterNameFunction(name, thisRoute);
             } else {
-
                 jsLine(`${name}: {`);
                 tsLine(`${name}: {`);
 
-                loopAllKeysOfMethod(route)
+                loopAllKeysOfMethod(route);
 
-                jsLine(`},`)
-                tsLine(`},`)
+                jsLine(`},`);
+                tsLine(`},`);
             }
         }
     }
 
     function setRouterNameFunction(shortName: string, route: ProcessedRouteData) {
         if (route && route.method) {
-            const routeParams = getRouteParams(route.path as string)
+            const routeParams = getRouteParams(route.path as string);
             const routeParamsKeys = Object.keys(routeParams);
             const commentLines = `
             /**
@@ -198,9 +188,8 @@ export = ($: DollarSign) => {
             `.trim();
 
             jsLines([
-                `${shortName}: (...args) => s(...p(b['${route.method}.${route.name}'], args)),`,
+                `${shortName}: (...args) => s(...p(b['${route.method}.${route.name}'], args)),`
             ]);
-
 
             /**
              * Typescript Lines.
@@ -210,34 +199,28 @@ export = ($: DollarSign) => {
 
             // check for route params
             if (routeParamsKeys.length) {
-                argumentsType = `params: {${paramsToTsType(routeParams)}} | SRParams`
+                argumentsType = `params: {${paramsToTsType(routeParams)}} | SRParams`;
             }
 
-            if (['post', 'put', 'patch'].includes(route.method.toLowerCase())) {
+            if (["post", "put", "patch"].includes(route.method.toLowerCase())) {
                 if (argumentsType) {
-                    argumentsType += `, body?: SRBody`
+                    argumentsType += `, body?: SRBody`;
                 } else {
-                    argumentsType = `body?: SRBody`
+                    argumentsType = `body?: SRBody`;
                 }
             } else {
                 if (argumentsType) {
-                    argumentsType += `, query?: SRQuery`
+                    argumentsType += `, query?: SRQuery`;
                 } else {
-                    argumentsType = `query?: SRQuery`
+                    argumentsType = `query?: SRQuery`;
                 }
             }
 
             argumentsType += `, config?: SRConfig, ...others: any[]`;
 
-            const defaultTsType = `${shortName}<T=any>(${argumentsType}): Promise<T>;`
+            const defaultTsType = `${shortName}<T=any>(${argumentsType}): Promise<T>;`;
 
-            tsLines([
-                '',
-                commentLines,
-                defaultTsType
-            ])
+            tsLines(["", commentLines, defaultTsType]);
         }
-
-
     }
-}
+};

@@ -1,4 +1,4 @@
-import type {DollarSign} from "xpresser/types";
+import type { DollarSign } from "xpresser/types";
 
 export = ($: DollarSign) => {
     const isDev = $.env("NODE_ENV") === "development";
@@ -7,7 +7,7 @@ export = ($: DollarSign) => {
         syncFilesOnServerBooted: true,
 
         // Folder where generated files will be saved to
-        buildFolder: $.path.base('src'),
+        buildFolder: $.path.base("src"),
 
         /**
          * When enabled, the generated frontend file will validate route parameters.
@@ -20,7 +20,7 @@ export = ($: DollarSign) => {
          */
         skipRouteIf(name: string) {
             // Note this will run on every route name.
-            return false
+            return false;
         }
-    }
-}
+    };
+};

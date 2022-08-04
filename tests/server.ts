@@ -1,7 +1,7 @@
-import {namespace} from "../use.json";
-import xpresser = require("xpresser");
+import { namespace } from "../use.json";
+import { init } from "xpresser";
 
-const $ = xpresser.init({
+const $ = init({
     env: "development",
     name: `Testing Plugin: ${namespace}`,
     paths: {
@@ -10,12 +10,11 @@ const $ = xpresser.init({
     server: {
         port: 2000
     }
-})
+});
 
 $.initializeTypescript(__filename, (isNode) => {
     // console.log(isNode)
 });
-
 
 // $.on.boot(next  => {
 //     console.log($.config.get('paths.routesFile'))
