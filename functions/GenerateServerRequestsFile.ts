@@ -133,12 +133,25 @@ export = ($: DollarSign) => {
         tabWidth: 2
     });
 
-    $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
-    $.file.fs().writeFileSync(ServerRequestsFilePath, content);
+    // $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
+    // $.file.fs().writeFileSync(ServerRequestsFilePath, content);
+
+    // write to files only if content changed.
+    // This prevents HMR in most frontend apps.
+    const currentContent = $.file.read(ServerRequestsFilePath).toString();
+    const currentTsContent = $.file.read(TsServerRequestsFilePath).toString();
+
+    if (currentContent !== content) $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
+    if (currentTsContent !== tsContent)
+        $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
 
     $.logSuccess("[FrontendHelper] ServerRequests file synced successfully.");
     $.logCalmly(`[FrontendHelper] Javascript file: ${ServerRequestsFilePath}`);
     $.logCalmly(`[FrontendHelper] Typescript file: ${TsServerRequestsFilePath}`);
+
+    /**
+     * ================ FUNCTIONS ================
+     */
 
     function jsLine(line: string) {
         JsContent.push(line);
