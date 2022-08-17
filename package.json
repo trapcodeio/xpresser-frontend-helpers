@@ -13,15 +13,15 @@
   },
   "devDependencies": {
     "@types/js-beautify": "^1.13.3",
-    "@types/prettier": "^2.6.4",
+    "@types/prettier": "^2.7.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.7.4",
     "xpresser": "^0.29.1"
   },
   "dependencies": {
-    "@xpresser/plugin-tools": "^1.2.5",
+    "@xpresser/plugin-tools": "^1.2.6",
     "build-url": "^6.0.1",
-    "js-beautify": "^1.14.4",
+    "js-beautify": "^1.14.5",
     "path-to-regexp": "^6.2.1",
     "prettier": "^2.7.1"
   }

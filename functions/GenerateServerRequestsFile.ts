@@ -141,13 +141,17 @@ export = ($: DollarSign) => {
     const currentContent = $.file.read(ServerRequestsFilePath).toString();
     const currentTsContent = $.file.read(TsServerRequestsFilePath).toString();
 
-    if (currentContent !== content) $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
-    if (currentTsContent !== tsContent)
+    if (currentContent !== content) {
+        $.file.fs().writeFileSync(ServerRequestsFilePath, tsContent);
+        $.logCalmly(`[FrontendHelper] Javascript file: ${ServerRequestsFilePath}`);
+    }
+
+    if (currentTsContent !== tsContent) {
         $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
+        $.logCalmly(`[FrontendHelper] Typescript file: ${TsServerRequestsFilePath}`);
+    }
 
     $.logSuccess("[FrontendHelper] ServerRequests file synced successfully.");
-    $.logCalmly(`[FrontendHelper] Javascript file: ${ServerRequestsFilePath}`);
-    $.logCalmly(`[FrontendHelper] Typescript file: ${TsServerRequestsFilePath}`);
 
     /**
      * ================ FUNCTIONS ================
