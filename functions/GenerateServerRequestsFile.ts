@@ -142,7 +142,7 @@ export = ($: DollarSign) => {
     const currentTsContent = $.file.read(TsServerRequestsFilePath).toString();
 
     if (currentContent !== content) {
-        $.file.fs().writeFileSync(ServerRequestsFilePath, tsContent);
+        $.file.fs().writeFileSync(ServerRequestsFilePath, content);
         $.logCalmly(`[FrontendHelper] Javascript file: ${ServerRequestsFilePath}`);
     }
 
