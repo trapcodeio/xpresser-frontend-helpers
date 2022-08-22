@@ -1,6 +1,6 @@
 {
   "name": "@trapcode/xpresser-frontend-helpers",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Xpresser Frontend Helper",
   "main": "js/index.js",
   "repository": "https://github.com/trapcodeio/xpresser-frontend-helpers",
