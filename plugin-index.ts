@@ -18,7 +18,7 @@ export function run(config: any, $: DollarSign) {
             );
 
             // Generate Files
-            GenerateServerRequestsFile.default($);
+            await GenerateServerRequestsFile.default($);
 
             // Continue with boot
             next();

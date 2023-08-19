@@ -7,7 +7,7 @@ import { getRouteParams, paramsToTsType } from "./Utils";
 import PluginConfig, { FrontendHelperConfig } from "../plugin-config";
 
 type ProcessedRouteData = RouteData & { url: string };
-export = ($: DollarSign) => {
+export = async ($: DollarSign) => {
     const pluginConfig: FrontendHelperConfig & { namespace: string } = PluginConfig.all();
 
     const folder = pluginConfig.buildFolder;
@@ -126,7 +126,7 @@ export = ($: DollarSign) => {
     let tsContent = TsContent.join(os.EOL);
 
     content = beautify(content, { indent_size: 2, space_in_empty_paren: true });
-    tsContent = pretty.format(tsContent, {
+    tsContent = await pretty.format(tsContent, {
         semi: true,
         parser: "typescript",
         bracketSpacing: true,
