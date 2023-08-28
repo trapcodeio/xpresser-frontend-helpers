@@ -2,11 +2,10 @@ import os from "os";
 import pretty from "prettier";
 import { js as beautify } from "js-beautify";
 import type { DollarSign } from "xpresser/types";
-import { RouteData } from "@xpresser/router/src/custom-types";
 import { getRouteParams, paramsToTsType } from "./Utils";
-import PluginConfig, { FrontendHelperConfig } from "../plugin-config";
+import PluginConfig, { FrontendHelperConfig, ProcessedRouteData } from "../plugin-config";
 
-type ProcessedRouteData = RouteData & { url: string };
+// type ProcessedRouteData = RouteData & { url: string };
 export = async ($: DollarSign) => {
     const pluginConfig: FrontendHelperConfig & { namespace: string } = PluginConfig.all();
 
@@ -235,7 +234,11 @@ export = async ($: DollarSign) => {
 
             argumentsType += `, config?: SRConfig, ...others: any[]`;
 
-            const defaultTsType = `${shortName}<T=any>(${argumentsType}): Promise<T>;`;
+            const ts = pluginConfig.typescript;
+            let returnType = ts.returnType;
+
+            if (returnType && typeof returnType === "function") returnType = returnType(route);
+            const defaultTsType = `${shortName}<T=any>(${argumentsType}): ${returnType};`;
 
             tsLines(["", commentLines, defaultTsType]);
         }

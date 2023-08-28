@@ -1,7 +1,9 @@
 import { namespace } from "./use.json";
 import defaultConfig from "./exports/config";
 import { loadPluginConfig } from "@xpresser/plugin-tools/src/Config";
+import type { RouteData } from "@xpresser/router/src/custom-types";
 
+export type ProcessedRouteData = RouteData & { url: string };
 export type FrontendHelperConfig = {
     namespace: string;
 
@@ -20,6 +22,13 @@ export type FrontendHelperConfig = {
      * @param name
      */
     skipRouteIf(name: string): boolean;
+
+    /**
+     * Typescript config
+     */
+    typescript: {
+        returnType: string | ((route: ProcessedRouteData) => string);
+    };
 };
 
 /**

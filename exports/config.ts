@@ -21,6 +21,10 @@ export = ($: DollarSign) => {
         skipRouteIf(name: string) {
             // Note this will run on every route name.
             return name === "name_of_route_you_wish_to_skip";
+        },
+
+        typescript: {
+            returnType: "Promise<T>"
         }
     };
 };
