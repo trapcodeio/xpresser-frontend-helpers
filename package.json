@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@types/js-beautify": "^1.14.0",
+    "@types/minify": "6.0.1",
     "@types/prettier": "^3.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.1.6",
@@ -22,7 +23,8 @@
     "@xpresser/plugin-tools": "^1.2.6",
     "build-url": "^6.0.1",
     "js-beautify": "^1.14.9",
+    "minify": "7.2.2",
     "path-to-regexp": "^6.2.1",
-    "prettier": "^3.0.2"
+    "prettier": "^3.0.3"
   }
 }

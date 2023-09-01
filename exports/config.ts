@@ -14,6 +14,8 @@ export = ($: DollarSign) => {
         // Since types are generated in a .d.ts file.
         requestHandlerFileName: "ServerRequestsHandler",
 
+        minify: true,
+
         /**
          * When enabled, the generated frontend file will validate route parameters.
          */

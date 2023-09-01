@@ -15,6 +15,9 @@ export type FrontendHelperConfig = {
     // Request handler file name
     requestHandlerFileName: string;
 
+    // Minify generated file
+    minify: boolean;
+
     /**
      * When enabled, the generated frontend file will validate route parameters.
      */

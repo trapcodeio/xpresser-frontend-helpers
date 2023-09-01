@@ -4,6 +4,7 @@ import { js as beautify } from "js-beautify";
 import type { DollarSign } from "xpresser/types";
 import { getRouteParams, paramsToTsType } from "./Utils";
 import PluginConfig, { FrontendHelperConfig, ProcessedRouteData } from "../plugin-config";
+import minify from "minify";
 
 // type ProcessedRouteData = RouteData & { url: string };
 export = async ($: DollarSign) => {
@@ -127,6 +128,16 @@ export = async ($: DollarSign) => {
     let tsContent = TsContent.join(os.EOL);
 
     content = beautify(content, { indent_size: 2, space_in_empty_paren: true });
+
+    // minify js if minify is enabled.
+    if (pluginConfig.minify) {
+        try {
+            content = await minify(ServerRequestsFilePath);
+        } catch (e) {
+            $.logError(e);
+        }
+    }
+
     tsContent = await pretty.format(tsContent, {
         semi: true,
         parser: "typescript",
