@@ -23,7 +23,6 @@ export function parseUrl(
 
         // if defined params is a string or number
         // change to array or to object if params is only 1
-
         url = SRParamsToObject(url, params, definedParams, strict);
 
         // Remove params from args

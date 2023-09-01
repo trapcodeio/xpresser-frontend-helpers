@@ -8,6 +8,7 @@ import PluginConfig, { FrontendHelperConfig, ProcessedRouteData } from "../plugi
 // type ProcessedRouteData = RouteData & { url: string };
 export = async ($: DollarSign) => {
     const pluginConfig: FrontendHelperConfig & { namespace: string } = PluginConfig.all();
+    const ts = pluginConfig.typescript;
 
     const folder = pluginConfig.buildFolder;
     if (!$.file.isDirectory(folder)) {
@@ -22,7 +23,7 @@ export = async ($: DollarSign) => {
         * This is an auto-generated file.
         * ----- DO NOT MODIFY -----
         * */`,
-        `import s from './ServerRequestsHandler';`,
+        `import s from './${pluginConfig.requestHandlerFileName}';`,
         `import {internalRouteParser as r, ${
             pluginConfig.strictUrlParser ? "parseUrlStrict" : "parseUrl"
         } as p} from '${pluginPath}';`,
@@ -37,9 +38,9 @@ export = async ($: DollarSign) => {
         "",
         `export type StringOrNumber = string | number;`,
         `export type SRBody = Record<StringOrNumber, any>;`,
-        `export type SRQuery = Record<StringOrNumber, StringOrNumber>;`,
+        `export type SRQuery = Record<StringOrNumber, any>;`,
         `export type SRParams = StringOrNumber | StringOrNumber[];`,
-        `export type SRConfig = Partial<{query: SRQuery, body: SRBody}> & Record<string, any>;`,
+        `export type SRConfig = ${ts.configType};`,
         "",
         `/**
          * Parse name to path.
@@ -65,6 +66,7 @@ export = async ($: DollarSign) => {
         if (typeof name === "string" && !pluginConfig.skipRouteIf(name)) {
             const routeParams = getRouteParams(route.path as string);
             let fControllerPath = `${route.method}.${name}`;
+
             Controllers.set(fControllerPath, () => ({ ...route }));
 
             jsLine(
@@ -234,7 +236,6 @@ export = async ($: DollarSign) => {
 
             argumentsType += `, config?: SRConfig, ...others: any[]`;
 
-            const ts = pluginConfig.typescript;
             let returnType = ts.returnType;
 
             if (returnType && typeof returnType === "function") returnType = returnType(route);

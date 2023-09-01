@@ -21,6 +21,11 @@ export = ($: DollarSign) => {
         skipRouteIf(name: string) {
             // Note this will run on every route name.
             return false;
+        },
+
+        typescript: {
+            returnType: "Promise<T>",
+            configType: "Record<string, any>;"
         }
     };
 };

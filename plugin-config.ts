@@ -12,6 +12,9 @@ export type FrontendHelperConfig = {
     // Folder where generated files will be saved to
     buildFolder: string;
 
+    // Request handler file name
+    requestHandlerFileName: string;
+
     /**
      * When enabled, the generated frontend file will validate route parameters.
      */
@@ -28,6 +31,7 @@ export type FrontendHelperConfig = {
      */
     typescript: {
         returnType: string | ((route: ProcessedRouteData) => string);
+        configType: string;
     };
 };
 

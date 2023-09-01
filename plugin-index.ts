@@ -3,7 +3,8 @@ import pluginConfig from "./plugin-config";
 
 export function run(config: any, $: DollarSign) {
     const buildFolder = pluginConfig.data.buildFolder;
-    const ServerRequestsHandler = `${buildFolder}/ServerRequestsHandler.js`;
+    const requestHandlerFileName = pluginConfig.data.requestHandlerFileName;
+    const ServerRequestsHandler = `${buildFolder}/${requestHandlerFileName}.js`;
 
     if (!$.file.exists(ServerRequestsHandler)) {
         $.logError(`[FrontendHelper] Note: ${ServerRequestsHandler} does not exist.`);

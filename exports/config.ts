@@ -9,6 +9,11 @@ export = ($: DollarSign) => {
         // Folder where generated files will be saved to
         buildFolder: $.path.base("src"),
 
+        // Request handler file name
+        // Note it must be a .js file.
+        // Since types are generated in a .d.ts file.
+        requestHandlerFileName: "ServerRequestsHandler",
+
         /**
          * When enabled, the generated frontend file will validate route parameters.
          */
@@ -24,7 +29,8 @@ export = ($: DollarSign) => {
         },
 
         typescript: {
-            returnType: "Promise<T>"
+            returnType: "Promise<T>",
+            configType: "Record<string, any>;"
         }
     };
 };
