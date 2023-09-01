@@ -4,7 +4,7 @@ import { js as beautify } from "js-beautify";
 import type { DollarSign } from "xpresser/types";
 import { getRouteParams, paramsToTsType } from "./Utils";
 import PluginConfig, { FrontendHelperConfig, ProcessedRouteData } from "../plugin-config";
-import minify from "minify";
+import { execSync } from "child_process";
 
 // type ProcessedRouteData = RouteData & { url: string };
 export = async ($: DollarSign) => {
@@ -129,10 +129,19 @@ export = async ($: DollarSign) => {
 
     content = beautify(content, { indent_size: 2, space_in_empty_paren: true });
 
+    // find terser bin path
+    let terserBinPath = require.resolve("terser").split("/terser/")[0];
+    terserBinPath += "/terser/bin/terser";
+
     // minify js if minify is enabled.
     if (pluginConfig.minify) {
         try {
-            content = await minify(ServerRequestsFilePath);
+            content = execSync(
+                `${terserBinPath} --compress --mangle -- ${ServerRequestsFilePath}`,
+                {
+                    encoding: "utf-8"
+                }
+            ).trim();
         } catch (e) {
             $.logError(e);
         }
