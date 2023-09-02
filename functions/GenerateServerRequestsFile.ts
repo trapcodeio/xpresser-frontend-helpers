@@ -150,8 +150,9 @@ export = async ($: DollarSign) => {
     tsContent = await pretty.format(tsContent, {
         semi: true,
         parser: "typescript",
-        bracketSpacing: true,
-        tabWidth: 2
+        bracketSpacing: false,
+        tabWidth: 2,
+        printWidth: 200
     });
 
     // $.file.fs().writeFileSync(TsServerRequestsFilePath, tsContent);
@@ -219,7 +220,6 @@ export = async ($: DollarSign) => {
             const commentLines = `
             /**
              * **${route.controller}**
-             * 
              * - \`[${route.name}]\`
              * - \`${route.method.toUpperCase()}: ${route.path}\`
              */
