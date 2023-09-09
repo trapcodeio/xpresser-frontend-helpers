@@ -101,8 +101,8 @@ export = async ($: DollarSign) => {
     jsLine(`return r(c, name, params, query, true);`);
     jsLines([`}`, ""]);
 
-    const ServerRequestsFilePath = `${folder}/ServerRequests.js`;
-    const TsServerRequestsFilePath = `${folder}/ServerRequests.d.ts`;
+    const ServerRequestsFilePath = `${folder}/${pluginConfig.requestFileName}.js`;
+    const TsServerRequestsFilePath = `${folder}/${pluginConfig.requestFileName}.d.ts`;
 
     jsLine(`export default {`);
     for (const method of Controllers.keys()) {
@@ -173,7 +173,7 @@ export = async ($: DollarSign) => {
         $.logCalmly(`[FrontendHelper] Typescript file: ${TsServerRequestsFilePath}`);
     }
 
-    $.logSuccess("[FrontendHelper] ServerRequests file synced successfully.");
+    $.logSuccess("[FrontendHelper] Synced successfully.");
 
     /**
      * ================ FUNCTIONS ================

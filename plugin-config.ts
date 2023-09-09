@@ -12,6 +12,9 @@ export type FrontendHelperConfig = {
     // Folder where generated files will be saved to
     buildFolder: string;
 
+    // Request file name
+    requestFileName: string;
+
     // Request handler file name
     requestHandlerFileName: string;
 

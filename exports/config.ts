@@ -9,6 +9,9 @@ export = ($: DollarSign) => {
         // Folder where generated files will be saved to
         buildFolder: $.path.base("src"),
 
+        // Request file name
+        requestFileName: "ServerRequests",
+
         // Request handler file name
         // Note it must be a .js file.
         // Since types are generated in a .d.ts file.
@@ -30,6 +33,7 @@ export = ($: DollarSign) => {
             return name === "name_of_route_you_wish_to_skip";
         },
 
+        // Typescript configurations
         typescript: {
             returnType: "Promise<T>",
             configType: "Record<string, any>;"

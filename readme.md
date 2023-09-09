@@ -37,9 +37,9 @@ router.get('/user/:userId/uploads/:fileId/', http => {
 In your frontend
 
 ```javascript
-import ServerRequests from "./auto-generated-file";
+import req from "./auto-generated-file";
 
-await ServerRequests.get.uploaded_file([userId, fileId]); // returns {"file": "image.png"}
+await req.get.uploaded_file([userId, fileId]); // returns {"file": "image.png"}
 ```
 
 ### More Examples
@@ -60,20 +60,20 @@ router.get('/songs/:genre/:year?/:month?/:day?').name('songs');
 Frontend.
 
 ```javascript
-import ServerRequests from "./auto-generated-file";
+import req from "./auto-generated-file";
 
-await ServerRequests.get.users({page: 2}) // GET: /user?page=2
-await ServerRequests.post.users({
+await req.get.users({page: 2}) // GET: /user?page=2
+await req.post.users({
   id: 35, name: "John Doe", email: "newuser@app.me", password: "password"
 }) // POST: /users with body
 
-await ServerRequests.get.user(35) // GET: /user/35
-await ServerRequests.patch.user(35, {
+await req.get.user(35) // GET: /user/35
+await req.patch.user(35, {
   password: "newPassword"
 }) // PATCH: /user/35
-await ServerRequests.delete.user(35) // DELETE: /user/35
+await req.delete.user(35) // DELETE: /user/35
 
-await ServerRequests.get.songs(["hip-hop", 2020, 4, 15]) // GET: /songs/hip-hop/2020/4/15
+await req.get.songs(["hip-hop", 2020, 4, 15]) // GET: /songs/hip-hop/2020/4/15
 ```
 
 ## What you get.
