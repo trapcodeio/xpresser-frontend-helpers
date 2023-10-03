@@ -234,6 +234,7 @@ export = async ($: DollarSign) => {
              */
 
             let argumentsType!: string;
+            let argumentsTypeForFunction!: string;
 
             // check for route params
             if (routeParamsKeys.length) {
@@ -254,14 +255,28 @@ export = async ($: DollarSign) => {
                 }
             }
 
-            argumentsType += `, config?: SRConfig, ...others: any[]`;
+            if (ts.argType === "default") {
+                argumentsType += `, config?: SRConfig, ...others: any[]`;
+            } else {
+                argumentsType += `, config?: SRConfig`;
+            }
+
+            argumentsTypeForFunction = `fn: () => {${argumentsType}}`;
 
             let returnType = ts.returnType;
 
             if (returnType && typeof returnType === "function") returnType = returnType(route);
-            const defaultTsType = `${shortName}<T=any>(${argumentsType}): ${returnType};`;
 
-            tsLines(["", commentLines, defaultTsType]);
+            const defaultTsType = `${shortName}<T=any>(${argumentsType}): ${returnType};`;
+            const defaultTsTypeForFunction = `${shortName}<T=any>(${argumentsTypeForFunction}): ${returnType};`;
+
+            if (ts.argType === "flexible") {
+                tsLines(["", commentLines, defaultTsTypeForFunction, defaultTsType]);
+            } else if (ts.argType === "function") {
+                tsLines(["", commentLines, defaultTsTypeForFunction]);
+            } else {
+                tsLines(["", commentLines, defaultTsType]);
+            }
         }
     }
 };

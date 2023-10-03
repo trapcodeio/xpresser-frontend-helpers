@@ -5,16 +5,30 @@ type StringOrNumber = string | number;
 type SRParams = StringOrNumber | StringOrNumber[] | Record<StringOrNumber, any>;
 type SRQuery = Record<StringOrNumber, StringOrNumber>;
 
-export function parseUrl(
-    data: [string, string, Record<StringOrNumber, boolean>],
-    args: any[],
-    strict: boolean = false
-) {
+// i.e [method, url, urlParams]
+// e.g ["get", "/users/:id", {id: true}]
+type ParseUrlData = [string, string, Record<StringOrNumber, boolean>];
+
+export function parseUrl(data: ParseUrlData, args: any[], strict: boolean = false) {
     // Get method, url and params form data passed.
     let [method, url, params] = data;
 
     // Hold ParamKeys
     const paramsKeys = typeof params === "object" ? Object.keys(params) : [];
+
+    // process args
+    if (typeof args[0] === "function") {
+        const computedArgs = args[0]() as Record<"params" | "query" | "body" | "config", any>;
+
+        if (paramsKeys.length > 0) {
+            args[0] = computedArgs.params;
+            args[1] = computedArgs.body || computedArgs.query;
+            args[2] = computedArgs.config;
+        } else {
+            args[0] = computedArgs.body || computedArgs.query;
+            args[1] = computedArgs.config;
+        }
+    }
 
     /* Check if request has Parameters */
     if (paramsKeys.length > 0) {
@@ -38,13 +52,20 @@ export function parseUrl(
         query = args[0] || {};
     }
 
-    return [url, { method, query, body, ...(args[1] || {}) }, args[2] || []];
+    return [
+        url,
+        {
+            method,
+            query,
+            body,
+            ...(args[1] || {})
+        },
+        // others is an array of arguments passed to the function after recognized arguments are removed.
+        args[2] || []
+    ];
 }
 
-export function parseUrlStrict(
-    data: [string, string, Record<StringOrNumber, boolean>],
-    args: any[]
-) {
+export function parseUrlStrict(data: ParseUrlData, args: any[]) {
     return parseUrl(data, args, true);
 }
 

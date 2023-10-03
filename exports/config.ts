@@ -17,7 +17,7 @@ export = ($: DollarSign) => {
         // Since types are generated in a .d.ts file.
         requestHandlerFileName: "ServerRequestsHandler",
 
-        minify: true,
+        minify: false,
 
         /**
          * When enabled, the generated frontend file will validate route parameters.
@@ -35,6 +35,7 @@ export = ($: DollarSign) => {
 
         // Typescript configurations
         typescript: {
+            argType: "flexible",
             returnType: "Promise<T>",
             configType: "Record<string, any>;"
         }

@@ -38,6 +38,7 @@ export type FrontendHelperConfig = {
     typescript: {
         returnType: string | ((route: ProcessedRouteData) => string);
         configType: string;
+        argType: "default" | "function" | "flexible"; // default: spread
     };
 };
 
